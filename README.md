@@ -220,3 +220,16 @@ Transaction → Account → Notification
 - 🌐 API Gateway routing config
 - 🧪 Sample transaction flow (end-to-end)
 - 🎯 How to explain this in **Fiserv interviews**
+
+---
+
+## Local Quickstart (Account Service)
+
+```bash
+cd account-service
+mvn clean package
+java -jar target/account-service-0.0.1-SNAPSHOT.jar
+```
+
+The service defaults to port `8081` and uses the `dev` profile defined in
+`account-service/src/main/resources/application-dev.yml`.

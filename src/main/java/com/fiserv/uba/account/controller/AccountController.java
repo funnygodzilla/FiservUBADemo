@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class AccountController {
      * POST /api/v1/accounts - Create a new account
      */
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') or hasAuthority('account:create')")
     public ResponseEntity<ApiResponse<AccountDTO>> createAccount(@RequestBody CreateAccountRequest request) {
         log.info("Creating account for customer: {}", request.getCustomerId());
         AccountDTO accountDTO = accountService.createAccount(request);
@@ -40,6 +42,7 @@ public class AccountController {
      * GET /api/v1/accounts/{accountNumber} - Get account by account number
      */
     @GetMapping("/{accountNumber}")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'MANAGER', 'USER') or hasAuthority('account:read'))")
     public ResponseEntity<ApiResponse<AccountDTO>> getAccount(@PathVariable String accountNumber) {
         log.info("Fetching account: {}", accountNumber);
         AccountDTO accountDTO = accountService.getAccountByNumber(accountNumber);
@@ -55,6 +58,7 @@ public class AccountController {
      * GET /api/v1/customers/{customerId}/accounts - Get all accounts for a customer
      */
     @GetMapping("/customer/{customerId}")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'MANAGER', 'USER') or hasAuthority('account:read'))")
     public ResponseEntity<ApiResponse<List<AccountDTO>>> getCustomerAccounts(@PathVariable Long customerId) {
         log.info("Fetching accounts for customer: {}", customerId);
         List<AccountDTO> accounts = accountService.getCustomerAccounts(customerId);
@@ -70,6 +74,7 @@ public class AccountController {
      * POST /api/v1/accounts/debit - Debit from an account
      */
     @PostMapping("/debit")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'MANAGER') or hasAuthority('transaction:write'))")
     public ResponseEntity<ApiResponse<AccountDTO>> debitAccount(@RequestBody TransactionRequest request) {
         log.info("Debiting account: {}", request.getAccountNumber());
         AccountDTO accountDTO = accountService.debitAccount(request);
@@ -85,6 +90,7 @@ public class AccountController {
      * POST /api/v1/accounts/credit - Credit to an account
      */
     @PostMapping("/credit")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'MANAGER') or hasAuthority('transaction:write'))")
     public ResponseEntity<ApiResponse<AccountDTO>> creditAccount(@RequestBody TransactionRequest request) {
         log.info("Crediting account: {}", request.getAccountNumber());
         AccountDTO accountDTO = accountService.creditAccount(request);
@@ -100,6 +106,7 @@ public class AccountController {
      * PUT /api/v1/accounts/{accountNumber}/freeze - Freeze an account
      */
     @PutMapping("/{accountNumber}/freeze")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('account:freeze')")
     public ResponseEntity<ApiResponse<AccountDTO>> freezeAccount(@PathVariable String accountNumber) {
         log.info("Freezing account: {}", accountNumber);
         AccountDTO accountDTO = accountService.freezeAccount(accountNumber);
@@ -115,6 +122,7 @@ public class AccountController {
      * PUT /api/v1/accounts/{accountNumber}/unfreeze - Unfreeze an account
      */
     @PutMapping("/{accountNumber}/unfreeze")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('account:freeze')")
     public ResponseEntity<ApiResponse<AccountDTO>> unfreezeAccount(@PathVariable String accountNumber) {
         log.info("Unfreezing account: {}", accountNumber);
         AccountDTO accountDTO = accountService.unfreezeAccount(accountNumber);

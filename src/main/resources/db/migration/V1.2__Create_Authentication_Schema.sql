@@ -172,13 +172,13 @@ ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
 -- =====================================================
 -- Create Default Admin User
--- Password: Admin@123 (BCrypt encoded)
+-- Password: Admin@123 (BCrypt encoded with strength 10)
 -- =====================================================
 INSERT INTO users (username, email, password, first_name, last_name, enabled, customer_id)
 VALUES (
     'admin',
     'admin@fiserv.com',
-    '$2a$10$8qXJPFEz3L1C0Q6Y.V9qU.GJvXKMQvL5Gx5x8WqXYZzZcQpYQ8Qxy',
+    '$2a$10$mQpM99Vvwx5sdQ0TBeSdguLVjQrJ2YON/DUqK.M4XOANTJULe5ErO',
     'System',
     'Administrator',
     TRUE,
@@ -198,12 +198,12 @@ ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
 -- Create Test Users
 -- =====================================================
 
--- Manager User (password: Manager@123)
+-- Manager User (password: Manager@123 - BCrypt encoded with strength 10)
 INSERT INTO users (username, email, password, first_name, last_name, enabled, customer_id)
 VALUES (
     'manager1',
     'manager1@fiserv.com',
-    '$2a$10$8qXJPFEz3L1C0Q6Y.V9qU.GJvXKMQvL5Gx5x8WqXYZzZcQpYQ8Qxy',
+    '$2a$10$3gRVrHj/s0ZwSNNTufTZ5.T5uk3Ug0PcTzcIv7DlOHfLh0sGLGSWO',
     'John',
     'Manager',
     TRUE,
@@ -218,12 +218,12 @@ CROSS JOIN roles r
 WHERE u.username = 'manager1' AND r.name = 'MANAGER'
 ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
 
--- Regular User (password: User@123)
+-- Regular User (password: User@123 - BCrypt encoded with strength 10)
 INSERT INTO users (username, email, password, first_name, last_name, enabled, customer_id)
 VALUES (
     'user1',
     'user1@fiserv.com',
-    '$2a$10$8qXJPFEz3L1C0Q6Y.V9qU.GJvXKMQvL5Gx5x8WqXYZzZcQpYQ8Qxy',
+    '$2a$10$.GSG3vuZavBXPS5JiodkVeejkPE24VbDx3c7cb/pD/kanMYhJZLhu',
     'Alice',
     'User',
     TRUE,
@@ -238,12 +238,12 @@ CROSS JOIN roles r
 WHERE u.username = 'user1' AND r.name = 'USER'
 ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
 
--- Customer User (password: Customer@123)
+-- Customer User (password: Customer@123 - BCrypt encoded with strength 10)
 INSERT INTO users (username, email, password, first_name, last_name, enabled, customer_id)
 VALUES (
     'customer1',
     'customer1@fiserv.com',
-    '$2a$10$8qXJPFEz3L1C0Q6Y.V9qU.GJvXKMQvL5Gx5x8WqXYZzZcQpYQ8Qxy',
+    '$2a$10$nVM5aF3UWsus6lgDJh.9Gu4AukT0jlA/7TURljJHRlhoaqcDDNIEO',
     'Bob',
     'Customer',
     TRUE,

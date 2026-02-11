@@ -112,8 +112,10 @@ curl -X POST http://localhost:8082/api/v1/accounts ^
 |----------|----------|------|-------------|
 | admin | Admin@123 | ADMIN | All permissions |
 | manager1 | Manager@123 | MANAGER | Account & transaction management |
-| user1 | User@123 | USER | Read accounts, create transactions |
+| user1 | User@123 | USER | Basic access |
 | customer1 | Customer@123 | CUSTOMER | Read-only access |
+
+**Note:** All passwords are BCrypt encoded in the database with strength 10. The migration file (V1.2) contains the correct hashes that match these documented passwords.
 
 ## Testing Different Scenarios
 

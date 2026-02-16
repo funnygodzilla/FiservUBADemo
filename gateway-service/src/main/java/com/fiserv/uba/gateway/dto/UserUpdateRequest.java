@@ -1,7 +1,10 @@
 package com.fiserv.uba.gateway.dto;
 
+import javax.validation.constraints.Email;
+
 public class UserUpdateRequest {
 
+    @Email(message = "Email should be valid")
     private String email;
     private String firstName;
     private String lastName;

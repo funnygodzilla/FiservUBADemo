@@ -3,6 +3,24 @@
 
 Enterprise-grade Unified Banking Application (UBA) built using Java 8, Spring Boot microservices, MySQL, Spring Security (JWT), API Gateway, and domain-driven design principles.
 
+## Multi-Service Split (Updated)
+
+The repository is now organized as a **multi-module Maven project** with separate deployable services:
+
+- `account-service/` → Account domain APIs, MySQL/Flyway resources, and account Spring Boot app.
+- `gateway-service/` → Reactive API Gateway integration for external banking security platform.
+
+Build all modules:
+```bash
+mvn clean package
+```
+
+Build a single module:
+```bash
+mvn -pl gateway-service -am clean package
+mvn -pl account-service -am clean package
+```
+
 ## Table of Contents
 
 - [Overview](#overview)

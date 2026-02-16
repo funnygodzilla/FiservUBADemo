@@ -1,5 +1,9 @@
 # Project File Structure - FiservUBADemo Account Service
 
+> **Update:** The codebase is now split into dedicated microservice modules:
+> - `account-service/` for account APIs
+> - `gateway-service/` for gateway/security orchestration
+
 **Generated:** February 6, 2026  
 **Status:** ✅ Complete
 

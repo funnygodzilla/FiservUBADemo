@@ -1,8 +1,13 @@
 package com.fiserv.uba.gateway.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class OtpValidateRequest {
 
+    @NotBlank(message = "OTP session ID is required")
     private String otpSessionId;
+    
+    @NotBlank(message = "OTP is required")
     private String otp;
 
     public String getOtpSessionId() {

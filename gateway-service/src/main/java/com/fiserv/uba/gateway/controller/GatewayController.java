@@ -19,6 +19,7 @@ import com.fiserv.uba.gateway.dto.UserResponse;
 import com.fiserv.uba.gateway.dto.UserUpdateRequest;
 import com.fiserv.uba.gateway.dto.VerifyTokenResponse;
 import com.fiserv.uba.gateway.service.GatewayService;
+import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,14 +41,14 @@ public class GatewayController {
     }
 
     @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseDTO<LoginResponse>> login(@RequestBody LoginRequest request) {
+    public Mono<ResponseDTO<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         return gatewayService.login(request);
     }
 
     @PostMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseDTO<UserResponse>> createUser(
         @RequestHeader("X-FISV-SESSION") String sessionToken,
-        @RequestBody UserCreateRequest request
+        @Valid @RequestBody UserCreateRequest request
     ) {
         return gatewayService.createUser(request, sessionToken);
     }
@@ -56,7 +57,7 @@ public class GatewayController {
     public Mono<ResponseDTO<UserResponse>> updateUser(
         @PathVariable String userId,
         @RequestHeader("X-FISV-SESSION") String sessionToken,
-        @RequestBody UserUpdateRequest request
+        @Valid @RequestBody UserUpdateRequest request
     ) {
         return gatewayService.updateUser(userId, request, sessionToken);
     }
@@ -64,7 +65,7 @@ public class GatewayController {
     @PostMapping(path = "/users/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseDTO<UserResponse>> findUser(
         @RequestHeader("X-FISV-SESSION") String sessionToken,
-        @RequestBody UserFindRequest request
+        @Valid @RequestBody UserFindRequest request
     ) {
         return gatewayService.findUser(request, sessionToken);
     }
@@ -80,24 +81,24 @@ public class GatewayController {
     }
 
     @PostMapping(path = "/otp", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseDTO<OtpResponse>> requestOtp(@RequestBody OtpRequest request) {
+    public Mono<ResponseDTO<OtpResponse>> requestOtp(@Valid @RequestBody OtpRequest request) {
         return gatewayService.requestOtp(request);
     }
 
     @PostMapping(path = "/otp/validate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseDTO<OtpValidateResponse>> validateOtp(@RequestBody OtpValidateRequest request) {
+    public Mono<ResponseDTO<OtpValidateResponse>> validateOtp(@Valid @RequestBody OtpValidateRequest request) {
         return gatewayService.validateOtp(request);
     }
 
     @PostMapping(path = "/password/reset", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseDTO<PasswordResetResponse>> resetPassword(@RequestBody PasswordResetRequest request) {
+    public Mono<ResponseDTO<PasswordResetResponse>> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
         return gatewayService.resetPassword(request);
     }
 
     @PostMapping(path = "/password/change", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseDTO<PasswordChangeResponse>> changePassword(
         @RequestHeader("X-FISV-SESSION") String sessionToken,
-        @RequestBody PasswordChangeRequest request
+        @Valid @RequestBody PasswordChangeRequest request
     ) {
         return gatewayService.changePassword(request, sessionToken);
     }

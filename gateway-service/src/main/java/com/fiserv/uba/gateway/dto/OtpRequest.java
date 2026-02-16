@@ -1,7 +1,10 @@
 package com.fiserv.uba.gateway.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class OtpRequest {
 
+    @NotBlank(message = "Username is required")
     private String username;
 
     public String getUsername() {

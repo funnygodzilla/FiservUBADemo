@@ -1,9 +1,16 @@
 package com.fiserv.uba.gateway.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class PasswordResetRequest {
 
+    @NotBlank(message = "Username is required")
     private String username;
+    
+    @NotBlank(message = "OTP is required")
     private String otp;
+    
+    @NotBlank(message = "New password is required")
     private String newPassword;
 
     public String getUsername() {

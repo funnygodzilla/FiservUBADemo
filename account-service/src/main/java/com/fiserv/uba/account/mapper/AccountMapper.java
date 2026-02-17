@@ -2,6 +2,7 @@ package com.fiserv.uba.account.mapper;
 
 import com.fiserv.uba.account.domain.Account;
 import com.fiserv.uba.account.dto.AccountResponseDTO;
+import java.math.BigDecimal;
 
 public final class AccountMapper {
 
@@ -15,7 +16,7 @@ public final class AccountMapper {
                 account.getAccountId(),
                 account.getStatus(),
                 account.getCurrency(),
-                account.getBalance() == null ? 0.0 : account.getBalance().doubleValue()
+                account.getBalance() == null ? BigDecimal.ZERO : account.getBalance()
         );
     }
 }

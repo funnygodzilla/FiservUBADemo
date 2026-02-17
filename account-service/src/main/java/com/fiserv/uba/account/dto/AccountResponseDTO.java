@@ -1,16 +1,18 @@
 package com.fiserv.uba.account.dto;
 
+import java.math.BigDecimal;
+
 public class AccountResponseDTO {
 
     private String accountId;
     private String status;
     private String currency;
-    private double balance;
+    private BigDecimal balance;
 
     public AccountResponseDTO() {
     }
 
-    public AccountResponseDTO(String accountId, String status, String currency, double balance) {
+    public AccountResponseDTO(String accountId, String status, String currency, BigDecimal balance) {
         this.accountId = accountId;
         this.status = status;
         this.currency = currency;
@@ -41,11 +43,11 @@ public class AccountResponseDTO {
         this.currency = currency;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 }

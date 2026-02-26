@@ -12,5 +12,7 @@
     <module>teller-config-service</module>
     <module>esf-service</module>
     <module>integrated-teller-service</module>
+    <module>audit-service</module>
+    <module>transaction-service</module>
   </modules>
 </project>

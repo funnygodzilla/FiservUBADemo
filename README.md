@@ -68,3 +68,22 @@ mvn -q -f teller-config-service/pom.xml -DskipTests compile
 mvn -q -f esf-service/pom.xml -DskipTests compile
 mvn -q -f integrated-teller-service/pom.xml -DskipTests compile
 ```
+
+## Newly Implemented Roadmap Items
+
+- Added **Audit Service** foundation for immutable audit event persistence (`/api/v1/audit-events`) including actor, branch, drawer, correlationId, before/after, timestamp.
+- Added **Transaction Service** foundation for teller cash operations:
+  - `POST /api/v1/transactions/cash-in`
+  - `POST /api/v1/transactions/cash-out`
+  - `POST /api/v1/transactions/transfer`
+  - `POST /api/v1/transactions/{txnRef}/approve`
+  - `POST /api/v1/transactions/{txnRef}/reverse`
+  - `POST /api/v1/cashbox/reconcile`
+- Implemented **AML threshold hook** and **OFAC hard-stop hook** integration points in transaction domain service.
+- Implemented **Gateway Correlation ID** propagation and response header support.
+- Added **Gateway rate limiting** global filter and downstream call timeout controls.
+- Added **API version aliases** (`/api/v1/...`) for gateway flows.
+
+## Change Log
+- Updated on: 2026-02-26 20:12:57 UTC (baseline check)
+- Updated on: 2026-02-26 20:12:57 UTC + implementation pass completed in this change set

@@ -4,6 +4,8 @@ import com.fiserv.uba.gateway.client.UserManagementClient;
 import com.fiserv.uba.gateway.dto.DrawerDTO;
 import com.fiserv.uba.gateway.dto.UpdatedUserContextDTO;
 import com.fiserv.uba.gateway.exception.GatewayException;
+import com.fiserv.uba.gateway.filter.CorrelationIdFilter;
+import java.time.Duration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,24 +24,28 @@ public class UserManagementHttpClient implements UserManagementClient {
     }
 
     @Override
-    public Mono<List<DrawerDTO>> getDrawers(String sub) {
+    public Mono<List<DrawerDTO>> getDrawers(String sub, String correlationId) {
         return webClient.get()
                 .uri("/users/{sub}/drawers", sub)
+                .header(CorrelationIdFilter.CORRELATION_HEADER, correlationId)
                 .retrieve()
                 .onStatus(status -> status.isError(), r -> r.bodyToMono(String.class)
                         .defaultIfEmpty("user-management unavailable")
                         .flatMap(m -> Mono.error(new GatewayException(HttpStatus.BAD_REQUEST, m))))
-                .bodyToMono(new ParameterizedTypeReference<List<DrawerDTO>>() {});
+                .bodyToMono(new ParameterizedTypeReference<List<DrawerDTO>>() {})
+                .timeout(Duration.ofSeconds(3));
     }
 
     @Override
-    public Mono<UpdatedUserContextDTO> selectDrawer(String sub, String drawerId) {
+    public Mono<UpdatedUserContextDTO> selectDrawer(String sub, String drawerId, String correlationId) {
         return webClient.post()
                 .uri("/users/{sub}/drawer/select/{drawerId}", sub, drawerId)
+                .header(CorrelationIdFilter.CORRELATION_HEADER, correlationId)
                 .retrieve()
                 .onStatus(status -> status.isError(), r -> r.bodyToMono(String.class)
                         .defaultIfEmpty("drawer selection failed")
                         .flatMap(m -> Mono.error(new GatewayException(HttpStatus.BAD_REQUEST, m))))
-                .bodyToMono(UpdatedUserContextDTO.class);
+                .bodyToMono(UpdatedUserContextDTO.class)
+                .timeout(Duration.ofSeconds(3));
     }
 }

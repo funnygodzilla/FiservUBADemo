@@ -1,0 +1,14 @@
+server:
+  port: 8087
+spring:
+  application:
+    name: transaction-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ubadb
+    username: ubadb
+    password: ubadb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml

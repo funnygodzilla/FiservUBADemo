@@ -2,6 +2,7 @@ package com.fiserv.uba.gateway.controller;
 
 import com.fiserv.uba.gateway.dto.CashBoxDTO;
 import com.fiserv.uba.gateway.dto.DrawerDTO;
+import com.fiserv.uba.gateway.filter.CorrelationIdFilter;
 import com.fiserv.uba.gateway.service.CashboxService;
 import com.fiserv.uba.gateway.service.DrawerFlowService;
 import java.util.List;
@@ -27,9 +28,11 @@ public class GatewayController {
         this.cashboxService = cashboxService;
     }
 
-    @GetMapping("/api/drawers")
-    public Mono<ResponseEntity<List<DrawerDTO>>> getDrawers(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        return drawerFlowService.fetchDrawers(authorization)
+    @GetMapping({"/api/drawers", "/api/v1/drawers"})
+    public Mono<ResponseEntity<List<DrawerDTO>>> getDrawers(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @RequestHeader(value = CorrelationIdFilter.CORRELATION_HEADER, required = false) String correlationId) {
+        return drawerFlowService.fetchDrawers(authorization, correlationId)
                 .map(result -> {
                     ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
                     if (result.newJwt() != null) {
@@ -39,15 +42,17 @@ public class GatewayController {
                 });
     }
 
-    @PostMapping("/api/drawer/select/{drawerId}")
+    @PostMapping({"/api/drawer/select/{drawerId}", "/api/v1/drawer/select/{drawerId}"})
     public Mono<ResponseEntity<Void>> selectDrawer(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                                   @PathVariable String drawerId) {
-        return drawerFlowService.selectDrawer(authorization, drawerId)
+                                                   @PathVariable String drawerId,
+                                                   @RequestHeader(value = CorrelationIdFilter.CORRELATION_HEADER, required = false) String correlationId) {
+        return drawerFlowService.selectDrawer(authorization, drawerId, correlationId)
                 .map(newToken -> ResponseEntity.ok().header("X-New-JWT", newToken).build());
     }
 
-    @GetMapping("/cashbox/details")
-    public Mono<ResponseEntity<CashBoxDTO>> getCashbox(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        return cashboxService.getCashbox(authorization).map(ResponseEntity::ok);
+    @GetMapping({"/cashbox/details", "/api/v1/cashbox/details"})
+    public Mono<ResponseEntity<CashBoxDTO>> getCashbox(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                                       @RequestHeader(value = CorrelationIdFilter.CORRELATION_HEADER, required = false) String correlationId) {
+        return cashboxService.getCashbox(authorization, correlationId).map(ResponseEntity::ok);
     }
 }

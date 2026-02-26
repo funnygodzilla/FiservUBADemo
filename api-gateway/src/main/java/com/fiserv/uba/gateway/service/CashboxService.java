@@ -21,7 +21,7 @@ public class CashboxService {
         this.esfClient = esfClient;
     }
 
-    public Mono<CashBoxDTO> getCashbox(String bearerToken, String correlationId) {
+    public Mono<CashBoxDTO> getCashbox(String bearerToken) {
         Claims claims = jwtUtil.parse(stripBearer(bearerToken));
         String sub = claims.getSubject();
         String branchId = claims.get("branchId", String.class);
@@ -33,7 +33,7 @@ public class CashboxService {
 
         return redisSessionService.get(sub, branchId, drawerId)
                 .switchIfEmpty(Mono.error(new GatewayException(HttpStatus.UNAUTHORIZED, "Session not found in Redis")))
-                .flatMap(session -> esfClient.getCashBoxDetails(bearerToken, correlationId));
+                .flatMap(session -> esfClient.getCashBoxDetails(bearerToken));
     }
 
     private String stripBearer(String bearer) {

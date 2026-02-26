@@ -21,11 +21,11 @@ class CashboxServiceTest {
 
         String token = jwtUtil.createToken("u1", "b1", "d1", "it1", List.of("ROLE_TELLER"));
         Mockito.when(redis.get("u1", "b1", "d1")).thenReturn(Mono.just(new UserSessionContext("u1", "b1", "d1", "it1", List.of(), List.of(), Map.of(), List.of())));
-        Mockito.when(esf.getCashBoxDetails("Bearer " + token, "corr-1")).thenReturn(Mono.just(new CashBoxDTO("d1", "b1", BigDecimal.ONE)));
+        Mockito.when(esf.getCashBoxDetails("Bearer " + token)).thenReturn(Mono.just(new CashBoxDTO("d1", "b1", BigDecimal.ONE)));
 
         CashboxService service = new CashboxService(jwtUtil, redis, esf);
 
-        StepVerifier.create(service.getCashbox("Bearer " + token, "corr-1"))
+        StepVerifier.create(service.getCashbox("Bearer " + token))
                 .expectNextMatches(dto -> dto.availableCash().compareTo(BigDecimal.ONE) == 0)
                 .verifyComplete();
     }

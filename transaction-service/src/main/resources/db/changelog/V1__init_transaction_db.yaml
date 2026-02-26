@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: codex
+      changes:
+        - createTable:
+            tableName: teller_transactions
+            columns:
+              - column: {name: txn_ref, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: transaction_type, type: varchar(32)}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: drawer_id, type: varchar(64)}
+              - column: {name: initiated_by, type: varchar(64)}
+              - column: {name: amount, type: numeric(19,2)}
+              - column: {name: status, type: varchar(32)}
+              - column: {name: reason_code, type: varchar(64)}
+              - column: {name: created_at, type: timestamp with time zone}
+        - createTable:
+            tableName: cashbox_state
+            columns:
+              - column: {name: drawer_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: opening_float, type: numeric(19,2)}
+              - column: {name: current_balance, type: numeric(19,2)}
+              - column: {name: status, type: varchar(32)}

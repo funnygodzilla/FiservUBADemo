@@ -1,0 +1,11 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: teller-config-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/userdb
+    username: userdb
+    password: userdb
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml

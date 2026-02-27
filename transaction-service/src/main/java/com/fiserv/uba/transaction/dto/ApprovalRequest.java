@@ -1,3 +1,3 @@
 package com.fiserv.uba.transaction.dto;
 
-public record ApprovalRequest(String approverId, String comment, String approverRole) {}
+public record ApprovalRequest(String approverId, String comment) {}

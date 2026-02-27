@@ -6,6 +6,6 @@ import java.util.List;
 import reactor.core.publisher.Mono;
 
 public interface UserManagementClient {
-    Mono<List<DrawerDTO>> getDrawers(String sub, String correlationId);
-    Mono<UpdatedUserContextDTO> selectDrawer(String sub, String drawerId, String correlationId);
+    Mono<List<DrawerDTO>> getDrawers(String sub);
+    Mono<UpdatedUserContextDTO> selectDrawer(String sub, String drawerId);
 }

@@ -1,114 +1,323 @@
-# Fiserv UBA Platform (Enterprise Demo Baseline)
+# FiservUBADemo
+# FiservUBADemo - Unified Banking Application
 
-Enterprise-oriented multi-service implementation for teller drawer context enrichment and downstream cashbox access.
+Enterprise-grade Unified Banking Application (UBA) built using Java 8, Spring Boot microservices, MySQL, Spring Security (JWT), API Gateway, and domain-driven design principles.
 
-## Tech Stack
-- Java 17
-- Spring Boot 3.x
-- Spring Cloud Gateway (WebFlux)
-- Spring Security + JWT
-- Spring Data JPA (PostgreSQL)
-- Spring Data Redis
-- OpenFeign
-- Kafka dependencies (event-ready)
-- Liquibase
-- Docker-ready modules
+## Table of Contents
 
-## Implemented Services
-- `api-gateway` (reactive edge service)
-- `user-management-service`
-- `teller-config-service`
-- `esf-service`
-- `integrated-teller-service` (downstream mock)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Technologies](#technologies)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Build & Run](#build--run)
+- [Docker Deployment](#docker-deployment)
+- [Configuration](#configuration)
+- [API Documentation](#api-documentation)
+- [Development](#development)
 
-## Contracted APIs
-### API Gateway
-- `GET /api/drawers`
-- `POST /api/drawer/select/{drawerId}`
-- `GET /cashbox/details`
+## Overview
 
-### User Management Service
-- `GET /users/{sub}/drawers`
-- `POST /users/{sub}/drawer/select/{drawerId}`
+FiservUBADemo is a comprehensive microservices-based banking application that provides:
 
-### Teller Config Service
-- `GET /config/roles/{roleId}`
-- `GET /config/branches/{branchId}`
+- **Account Management**: Complete account lifecycle management
+- **Security**: JWT-based authentication and authorization
+- **Scalability**: Cloud-ready microservices architecture
+- **Reliability**: Spring Boot best practices and production-ready configurations
+- **Integration**: OpenFeign for inter-service communication
+- **Monitoring**: Spring Boot Actuator for health checks and metrics
 
-### ESF + Integrated Teller
-- `GET /cashbox/details`
+## Architecture
 
-## Enterprise Flow Notes
-1. Gateway validates JWT before routing.
-2. `GET /api/drawers` retrieves drawers from user-management.
-3. Single drawer assignment triggers immediate selection and token exchange.
-4. Gateway returns enriched token in `X-New-JWT`.
-5. Session context is saved in Redis as `session:{userId}:{branchId}:{drawerId}`.
-6. `GET /cashbox/details` requires enriched JWT and active Redis session.
-7. Drawer-selection failures are returned as 4xx and do not replace existing token.
+The application follows a microservices architecture pattern with the following components:
 
-## Databases
-### USER DB (Liquibase)
-- `users`
-- `drawers`
-- `branches`
-- `roles`
-- `user_drawer_mapping`
-- `user_role_mapping`
-
-### UBA DB (Liquibase)
-- `transaction_log`
-- `cashbox_state`
-
-## Build / Validation
-```bash
-mvn -q -f api-gateway/pom.xml test
-mvn -q -f user-management-service/pom.xml -DskipTests compile
-mvn -q -f teller-config-service/pom.xml -DskipTests compile
-mvn -q -f esf-service/pom.xml -DskipTests compile
-mvn -q -f integrated-teller-service/pom.xml -DskipTests compile
+```
+┌─────────────────────────────────────────────────┐
+│           API Gateway / Load Balancer            │
+└──────────────────┬──────────────────────────────┘
+                   │
+       ┌───────────┼───────────┐
+       │           │           │
+┌──────▼──────┐   │    ┌──────▼──────┐
+│   Account   │   │    │   Other     │
+│  Service    │   │    │  Services   │
+└──────┬──────┘   │    └─────────────┘
+       │          │
+┌──────▼──────┐   │    ┌──────────────┐
+│   MySQL     │   │    │ Eureka/      │
+│  Database   │   │    │ Service Disc. │
+└─────────────┘   │    └──────────────┘
+                  │
+           ┌──────▼──────┐
+           │   JWT Auth  │
+           │   Provider  │
+           └─────────────┘
 ```
 
-## Newly Implemented Roadmap Items
+## Technologies
 
-- Added **Audit Service** foundation for immutable audit event persistence (`/api/v1/audit-events`) including actor, branch, drawer, correlationId, before/after, timestamp.
-- Added **Transaction Service** foundation for teller cash operations:
-  - `POST /api/v1/transactions/cash-in`
-  - `POST /api/v1/transactions/cash-out`
-  - `POST /api/v1/transactions/transfer`
-  - `POST /api/v1/transactions/{txnRef}/approve`
-  - `POST /api/v1/transactions/{txnRef}/reverse`
-  - `POST /api/v1/cashbox/reconcile`
-- Implemented **AML threshold hook** and **OFAC hard-stop hook** integration points in transaction domain service.
-- Implemented **Gateway Correlation ID** propagation and response header support.
-- Added **Gateway rate limiting** global filter and downstream call timeout controls.
-- Added **API version aliases** (`/api/v1/...`) for gateway flows.
+- **Java 8**: Core language
+- **Spring Boot 2.7.14**: Application framework
+- **Spring Cloud 2021.0.8**: Cloud-native features
+  - Eureka: Service discovery
+  - OpenFeign: Declarative HTTP client
+- **Spring Security**: Authentication & Authorization
+- **JWT (JJWT 0.11.5)**: Token-based security
+- **Spring Data JPA**: Data persistence
+- **MySQL 8.0**: Relational database
+- **Lombok**: Boilerplate code reduction
+- **MapStruct**: Object mapping
+- **Maven**: Build tool
+- **Docker**: Containerization
 
-## Change Log
-- Updated on: 2026-02-26 20:12:57 UTC (baseline check)
-- Updated on: 2026-02-26 20:12:57 UTC + implementation pass completed in this change set
+## Project Structure
 
+```
+FiservUBADemo/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/fiserv/uba/account/
+│       │       ├── AccountServiceApplication.java    # Main application class
+│       │       ├── controller/                        # REST endpoints
+│       │       ├── service/                           # Business logic
+│       │       ├── repository/                        # Data access layer
+│       │       ├── domain/                            # Entity classes
+│       │       ├── dto/                               # Data Transfer Objects
+│       │       ├── mapper/                            # Entity to DTO mappers
+│       │       ├── exception/                         # Custom exceptions
+│       │       ├── config/                            # Configuration classes
+│       │       ├── client/                            # Feign clients
+│       │       └── util/                              # Utility classes
+│       └── resources/
+│           └── application.yml                        # Application configuration
+├── pom.xml                                             # Maven dependencies
+├── Dockerfile                                          # Docker image definition
+├── README.md                                           # This file
+└── .gitignore                                          # Git ignore rules
+```
 
-## Enterprise Expansion (Compliance + Teller Ops + Frontend)
+## Prerequisites
 
-This iteration extends the architecture with enterprise controls and an operations UI:
+- **Java 8 or higher**: `java -version`
+- **Maven 3.6+**: `mvn -version`
+- **MySQL 8.0+**: Database server running
+- **Docker** (optional): For containerized deployment
 
-- **Transaction service enhancements**
-  - Cashbox lifecycle APIs: `POST /api/v1/cashbox/open`, `POST /api/v1/cashbox/close`
-  - Adjustment API: `POST /api/v1/cashbox/adjustments`
-  - Variance dual-approval API: `POST /api/v1/cashbox/variance/approve`
-  - Idempotency replay API: `GET /api/v1/idempotency/{idempotencyKey}`
-  - Maker-checker guard (approver cannot be initiator) and supervisor enforcement for high-value flows
-- **Audit service enhancements**
-  - Compliance alert lifecycle APIs:
-    - `POST /api/v1/compliance/alerts`
-    - `POST /api/v1/compliance/alerts/{alertId}/disposition`
-    - `POST /api/v1/compliance/alerts/{alertId}/legal-hold`
-    - `GET /api/v1/compliance/reports`
-  - OFAC decision persistence + override rationale requirement
-  - Legal hold state operations for evidence retention governance
-- **Frontend module**
-  - Added `ops-portal-ui` Spring Boot web app (port `8090`) with a single-page operations console for teller + compliance workflows.
+## Build & Run
 
-## Change Log
-- Updated on: 2026-02-26 20:37:56 UTC (enterprise implementation + frontend portal)
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/FiservUBADemo.git
+cd FiservUBADemo
+```
+
+### 2. Configure Application
+
+Create `src/main/resources/application.yml`:
+
+```yaml
+spring:
+  application:
+    name: account-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/uba_account_db
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  security:
+    jwt:
+      secret: your-secret-key-min-256-bits-long
+      expiration: 86400000  # 24 hours
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+```
+
+### 3. Build the Application
+
+```bash
+mvn clean package
+```
+
+### 4. Run the Application
+
+```bash
+java -jar target/account-service-1.0.0.jar
+```
+
+The application will start on `http://localhost:8080`
+
+## Docker Deployment
+
+### Build Docker Image
+
+```bash
+docker build -t fiserv-uba-account-service:latest .
+```
+
+### Run Container
+
+```bash
+docker run -d \
+  --name account-service \
+  -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/uba_account_db \
+  -e SPRING_DATASOURCE_USERNAME=root \
+  -e SPRING_DATASOURCE_PASSWORD=your_password \
+  -e SPRING_SECURITY_JWT_SECRET=your-secret-key \
+  fiserv-uba-account-service:latest
+```
+
+### Docker Compose (Optional)
+
+For complete stack deployment with MySQL:
+
+```yaml
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: uba_account_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  account-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/uba_account_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SPRING_DATASOURCE_URL` | Database URL | `jdbc:mysql://localhost:3306/uba_account_db` |
+| `SPRING_DATASOURCE_USERNAME` | Database username | `root` |
+| `SPRING_DATASOURCE_PASSWORD` | Database password | Required |
+| `SPRING_SECURITY_JWT_SECRET` | JWT signing secret | Required |
+| `SERVER_PORT` | Server port | `8080` |
+| `EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE` | Eureka server URL | `http://localhost:8761/eureka/` |
+
+### Application Properties
+
+See `src/main/resources/application.yml` for complete configuration options.
+
+## API Documentation
+
+### Health Check
+
+```bash
+curl http://localhost:8080/api/actuator/health
+```
+
+### Info
+
+```bash
+curl http://localhost:8080/api/actuator/info
+```
+
+### Metrics
+
+```bash
+curl http://localhost:8080/api/actuator/metrics
+```
+
+## Development
+
+### Adding Dependencies
+
+Edit `pom.xml` and add your dependency, then run:
+
+```bash
+mvn dependency:resolve
+```
+
+### Running Tests
+
+```bash
+mvn test
+```
+
+### Code Quality
+
+```bash
+mvn clean verify
+```
+
+## Troubleshooting
+
+### Connection Refused
+
+Ensure MySQL is running and accessible at the configured URL.
+
+### Port Already in Use
+
+Change `server.port` in application.yml or use:
+
+```bash
+java -Dserver.port=8081 -jar target/account-service-1.0.0.jar
+```
+
+### Build Errors
+
+Clear Maven cache:
+
+```bash
+mvn clean install -U
+```
+
+## License
+
+This project is part of Fiserv's Banking Solutions and is proprietary.
+
+## Support
+
+For issues and questions, contact your development team or create an issue in the repository.
+
+---
+
+**Last Updated**: February 2026
+**Version**: 1.0.0

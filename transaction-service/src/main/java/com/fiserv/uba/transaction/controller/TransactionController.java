@@ -18,21 +18,21 @@ public class TransactionController {
     public TransactionResponse cashIn(@RequestBody TransactionRequest request,
                                       @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId,
                                       @RequestHeader("Idempotency-Key") String idempotencyKey) {
-        return service.cashIn(request, correlationId == null ? idempotencyKey : correlationId, idempotencyKey);
+        return service.cashIn(request, correlationId == null ? idempotencyKey : correlationId);
     }
 
     @PostMapping("/transactions/cash-out")
     public TransactionResponse cashOut(@RequestBody TransactionRequest request,
                                        @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId,
                                        @RequestHeader("Idempotency-Key") String idempotencyKey) {
-        return service.cashOut(request, correlationId == null ? idempotencyKey : correlationId, idempotencyKey);
+        return service.cashOut(request, correlationId == null ? idempotencyKey : correlationId);
     }
 
     @PostMapping("/transactions/transfer")
     public TransactionResponse transfer(@RequestBody TransactionRequest request,
                                         @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId,
                                         @RequestHeader("Idempotency-Key") String idempotencyKey) {
-        return service.transfer(request, correlationId == null ? idempotencyKey : correlationId, idempotencyKey);
+        return service.transfer(request, correlationId == null ? idempotencyKey : correlationId);
     }
 
     @PostMapping("/transactions/{txnRef}/approve")
@@ -49,38 +49,9 @@ public class TransactionController {
         return service.reverse(txnRef, reasonCode, correlationId);
     }
 
-    @PostMapping("/cashbox/open")
-    public TransactionResponse openCashbox(@RequestBody CashboxLifecycleRequest request,
-                                           @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId) {
-        return service.openCashbox(request, correlationId == null ? request.idempotencyKey() : correlationId);
-    }
-
-    @PostMapping("/cashbox/close")
-    public TransactionResponse closeCashbox(@RequestBody CashboxLifecycleRequest request,
-                                            @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId) {
-        return service.closeCashbox(request, correlationId == null ? request.idempotencyKey() : correlationId);
-    }
-
-    @PostMapping("/cashbox/adjustments")
-    public TransactionResponse adjustment(@RequestBody AdjustmentRequest request,
-                                          @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId) {
-        return service.adjustment(request, correlationId == null ? request.idempotencyKey() : correlationId);
-    }
-
     @PostMapping("/cashbox/reconcile")
     public ReconcileResponse reconcile(@RequestBody ReconcileRequest request,
                                        @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId) {
         return service.reconcile(request, correlationId);
-    }
-
-    @PostMapping("/cashbox/variance/approve")
-    public TransactionResponse approveVariance(@RequestBody VarianceApprovalRequest request,
-                                               @RequestHeader(value = "X-Correlation-ID", required = false) String correlationId) {
-        return service.approveVariance(request, correlationId);
-    }
-
-    @GetMapping("/idempotency/{idempotencyKey}")
-    public IdempotencyReplayResponse replay(@PathVariable String idempotencyKey) {
-        return service.replay(idempotencyKey);
     }
 }

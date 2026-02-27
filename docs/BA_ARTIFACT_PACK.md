@@ -273,16 +273,3 @@ Without comprehensive compliance controls, the platform is not ready for U.S. ba
 
 - Artifact revised on: **2026-02-26 20:12:57 UTC**
 - Context: roadmap implementation alignment for audit/compliance foundation, teller transaction domain foundation, gateway correlation/rate-limit hardening.
-
-
-## 6) Implementation Delta (Enterprise Pass)
-
-### Delivered in this pass
-- Compliance alert lifecycle operationalized (open, triage/disposition, legal hold, reporting extract API).
-- Teller operations completion for cashbox open/close, adjustments, and variance approval.
-- Maker-checker control hardened for approvals and variance decisions.
-- Idempotency persistence + replay endpoint added for transaction safety and retry resilience.
-- Frontend operations portal (`ops-portal-ui`) introduced for end-to-end teller/compliance orchestration.
-
-### Timestamp
-- Artifact revised on: **2026-02-26 20:37:56 UTC**

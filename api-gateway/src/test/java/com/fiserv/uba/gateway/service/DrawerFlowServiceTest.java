@@ -31,11 +31,11 @@ class DrawerFlowServiceTest {
     @Test
     void singleDrawerAutoEnrichment() {
         String token = jwtUtil.createToken("user1", "", "", "", List.of("ROLE_TELLER"));
-        Mockito.when(userManagementClient.getDrawers("user1", "corr-1")).thenReturn(Mono.just(List.of(new DrawerDTO("D1", "B1", "main"))));
-        Mockito.when(userManagementClient.selectDrawer("user1", "D1", "corr-1")).thenReturn(Mono.just(new UpdatedUserContextDTO("user1", "B1", "D1", "it1", List.of("ROLE_TELLER"))));
+        Mockito.when(userManagementClient.getDrawers("user1")).thenReturn(Mono.just(List.of(new DrawerDTO("D1", "B1", "main"))));
+        Mockito.when(userManagementClient.selectDrawer("user1", "D1")).thenReturn(Mono.just(new UpdatedUserContextDTO("user1", "B1", "D1", "it1", List.of("ROLE_TELLER"))));
         Mockito.when(tokenExchangeService.exchange(any())).thenReturn(Mono.just("new.jwt"));
 
-        StepVerifier.create(service.fetchDrawers("Bearer " + token, "corr-1"))
+        StepVerifier.create(service.fetchDrawers("Bearer " + token))
                 .assertNext(result -> {
                     assert result.drawers().size() == 1;
                     assert "new.jwt".equals(result.newJwt());
@@ -45,23 +45,23 @@ class DrawerFlowServiceTest {
     @Test
     void multiDrawerNoAutoEnrichment() {
         String token = jwtUtil.createToken("user2", "", "", "", List.of("ROLE_TELLER"));
-        Mockito.when(userManagementClient.getDrawers("user2", "corr-1")).thenReturn(Mono.just(List.of(
+        Mockito.when(userManagementClient.getDrawers("user2")).thenReturn(Mono.just(List.of(
                 new DrawerDTO("D1", "B1", "main"), new DrawerDTO("D2", "B1", "backup"))));
 
-        StepVerifier.create(service.fetchDrawers("Bearer " + token, "corr-1"))
+        StepVerifier.create(service.fetchDrawers("Bearer " + token))
                 .assertNext(result -> {
                     assert result.drawers().size() == 2;
                     assert result.newJwt() == null;
                 }).verifyComplete();
 
-        Mockito.verify(userManagementClient, Mockito.never()).selectDrawer(eq("user2"), any(), any());
+        Mockito.verify(userManagementClient, Mockito.never()).selectDrawer(eq("user2"), any());
     }
 
     @Test
     void selectionErrorFlowReturnsFailure() {
         String token = jwtUtil.createToken("user3", "", "", "", List.of("ROLE_TELLER"));
-        Mockito.when(userManagementClient.selectDrawer("user3", "D9", "corr-1")).thenReturn(Mono.error(new RuntimeException("down")));
-        StepVerifier.create(service.selectDrawer("Bearer " + token, "D9", "corr-1"))
+        Mockito.when(userManagementClient.selectDrawer("user3", "D9")).thenReturn(Mono.error(new RuntimeException("down")));
+        StepVerifier.create(service.selectDrawer("Bearer " + token, "D9"))
                 .expectError()
                 .verify();
     }

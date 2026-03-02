@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: codex
+      changes:
+        - createTable:
+            tableName: transaction_log
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: txn_ref, type: varchar(128)}
+              - column: {name: created_at, type: timestamp}
+        - createTable:
+            tableName: cashbox_state
+            columns:
+              - column: {name: drawer_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: available_cash, type: numeric(19,2)}

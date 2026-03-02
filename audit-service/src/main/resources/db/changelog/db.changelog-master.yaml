@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/V1__init_audit_db.yaml
+  - include:
+      file: db/changelog/V2__compliance_alerts.yaml

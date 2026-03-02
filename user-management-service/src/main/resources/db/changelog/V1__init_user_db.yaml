@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: codex
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column: {name: user_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: it_user_id, type: varchar(64)}
+              - column: {name: branch_id, type: varchar(64)}
+        - createTable:
+            tableName: drawers
+            columns:
+              - column: {name: drawer_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: name, type: varchar(128)}
+        - createTable:
+            tableName: branches
+            columns:
+              - column: {name: branch_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(128)}
+        - createTable:
+            tableName: roles
+            columns:
+              - column: {name: role_id, type: varchar(64), constraints: {primaryKey: true}}
+              - column: {name: role_name, type: varchar(128)}
+        - createTable:
+            tableName: user_drawer_mapping
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: user_id, type: varchar(64)}
+              - column: {name: drawer_id, type: varchar(64)}
+        - createTable:
+            tableName: user_role_mapping
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: user_id, type: varchar(64)}
+              - column: {name: role_id, type: varchar(64)}

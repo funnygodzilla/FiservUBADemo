@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: codex
+      changes:
+        - createTable:
+            tableName: audit_events
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: actor, type: varchar(128)}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: drawer_id, type: varchar(64)}
+              - column: {name: correlation_id, type: varchar(128)}
+              - column: {name: action, type: varchar(128)}
+              - column: {name: before_state, type: varchar(4096)}
+              - column: {name: after_state, type: varchar(4096)}
+              - column: {name: created_at, type: timestamp with time zone}

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UBA Enterprise Operations Portal</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;background:#f5f7fb;color:#1f2937}
+    header{background:#0f172a;color:white;padding:16px 24px}
+    main{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    section{background:white;border-radius:8px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+    input,select,button{width:100%;padding:8px;margin:6px 0}
+    button{background:#1d4ed8;color:white;border:none;border-radius:4px;cursor:pointer}
+    pre{background:#111827;color:#e5e7eb;padding:8px;min-height:80px;overflow:auto}
+  </style>
+</head>
+<body>
+<header><h2>UBA Enterprise Operations Portal</h2></header>
+<main>
+  <section>
+    <h3>Cashbox Open/Close</h3>
+    <input id="coBranch" placeholder="Branch ID" value="BR-1001"/>
+    <input id="coDrawer" placeholder="Drawer ID" value="DR-1001"/>
+    <input id="coActor" placeholder="Actor" value="teller01"/>
+    <input id="coAmount" placeholder="Amount" value="5000"/>
+    <input id="coKey" placeholder="Idempotency Key" value="open-001"/>
+    <button onclick="callApi('/api/v1/cashbox/open', cashboxPayload(), 'txnOut')">Open Cashbox</button>
+    <button onclick="callApi('/api/v1/cashbox/close', cashboxPayload(), 'txnOut')">Close Cashbox</button>
+  </section>
+
+  <section>
+    <h3>Teller Transaction</h3>
+    <select id="txType"><option>cash-in</option><option>cash-out</option><option>transfer</option></select>
+    <input id="txBranch" placeholder="Branch ID" value="BR-1001"/>
+    <input id="txDrawer" placeholder="Drawer ID" value="DR-1001"/>
+    <input id="txActor" placeholder="Actor" value="teller01"/>
+    <input id="txAmount" placeholder="Amount" value="12000"/>
+    <input id="txReason" placeholder="Reason" value="CUSTOMER_REQUEST"/>
+    <input id="txKey" placeholder="Idempotency Key" value="tx-001"/>
+    <button onclick="submitTransaction()">Submit Transaction</button>
+  </section>
+
+  <section>
+    <h3>Compliance Alert Lifecycle</h3>
+    <input id="caEvent" placeholder="Event Type" value="AML_THRESHOLD_BREACH"/>
+    <input id="caBranch" placeholder="Branch ID" value="BR-1001"/>
+    <input id="caDrawer" placeholder="Drawer ID" value="DR-1001"/>
+    <input id="caActor" placeholder="Actor" value="teller01"/>
+    <input id="caSeverity" placeholder="Severity" value="HIGH"/>
+    <input id="caAssigned" placeholder="Assigned Investigator" value="investigator01"/>
+    <button onclick="createAlert()">Create Alert</button>
+    <input id="alertId" placeholder="Alert ID for actions" />
+    <button onclick="dispositionAlert()">Disposition Alert</button>
+    <button onclick="legalHold()">Apply Legal Hold</button>
+  </section>
+
+  <section>
+    <h3>API Output</h3>
+    <pre id="txnOut">Ready</pre>
+  </section>
+</main>
+<script>
+const transactionBase='http://localhost:8086';
+const auditBase='http://localhost:8085';
+async function callApi(path,payload,target,base=transactionBase,method='POST',idempotencyKey){
+  const out=document.getElementById(target);
+  try{
+    const headers={'Content-Type':'application/json'};
+    if(idempotencyKey){headers['Idempotency-Key']=idempotencyKey;} else if(payload && payload.idempotencyKey){headers['Idempotency-Key']=payload.idempotencyKey;}
+    const res=await fetch(base+path,{method,headers,body:method==='GET'?undefined:JSON.stringify(payload)});
+    const text=await res.text();
+    out.textContent=`${res.status}\n${text}`;
+  }catch(e){out.textContent=e.toString();}
+}
+function cashboxPayload(){
+  return {branchId:coBranch.value,drawerId:coDrawer.value,initiatedBy:coActor.value,amount:Number(coAmount.value),terminalId:'TERMINAL-01',idempotencyKey:coKey.value};
+}
+function submitTransaction(){
+  const type=document.getElementById('txType').value;
+  const payload={branchId:txBranch.value,drawerId:txDrawer.value,initiatedBy:txActor.value,amount:Number(txAmount.value),reasonCode:txReason.value};
+  callApi(`/api/v1/transactions/${type}`,payload,'txnOut',transactionBase,'POST',txKey.value);
+}
+async function createAlert(){
+  const payload={eventType:caEvent.value,branchId:caBranch.value,drawerId:caDrawer.value,actor:caActor.value,severity:caSeverity.value,assignedTo:caAssigned.value,slaHours:4,ofacDecision:'NEEDS_REVIEW'};
+  await callApi('/api/v1/compliance/alerts',payload,'txnOut',auditBase);
+}
+async function dispositionAlert(){
+  const id=alertId.value;
+  await callApi(`/api/v1/compliance/alerts/${id}/disposition`,{disposition:'INVESTIGATED_NO_ESCALATION',status:'CLOSED',actor:'investigator01'},'txnOut',auditBase);
+}
+async function legalHold(){
+  const id=alertId.value;
+  await callApi(`/api/v1/compliance/alerts/${id}/legal-hold`,{holdState:'ON_HOLD',actor:'supervisor01',reason:'SAR_PREPARATION'},'txnOut',auditBase);
+}
+</script>
+</body>
+</html>

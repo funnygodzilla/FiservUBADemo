@@ -1,0 +1,18 @@
+server:
+  port: 8086
+spring:
+  application:
+    name: audit-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auditdb
+    username: auditdb
+    password: auditdb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+app:
+  retention:
+    audit-days: 2555
+    legal-hold-enabled: true

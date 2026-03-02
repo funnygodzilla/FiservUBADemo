@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: codex
+      changes:
+        - createTable:
+            tableName: idempotency_record
+            columns:
+              - column: {name: idempotency_key, type: varchar(128), constraints: {primaryKey: true}}
+              - column: {name: operation, type: varchar(64)}
+              - column: {name: transaction_ref, type: varchar(64)}
+              - column: {name: status, type: varchar(32)}
+              - column: {name: response_payload, type: varchar(2048)}
+              - column: {name: created_at, type: timestamp with time zone}

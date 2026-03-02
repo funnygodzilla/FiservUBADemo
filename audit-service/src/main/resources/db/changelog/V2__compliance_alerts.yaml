@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: codex
+      changes:
+        - createTable:
+            tableName: compliance_alert
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: event_type, type: varchar(64)}
+              - column: {name: branch_id, type: varchar(64)}
+              - column: {name: drawer_id, type: varchar(64)}
+              - column: {name: actor, type: varchar(64)}
+              - column: {name: severity, type: varchar(32)}
+              - column: {name: status, type: varchar(32)}
+              - column: {name: assigned_to, type: varchar(64)}
+              - column: {name: sla_deadline, type: timestamp with time zone}
+              - column: {name: disposition, type: varchar(512)}
+              - column: {name: ofac_decision, type: varchar(32)}
+              - column: {name: override_rationale, type: varchar(1024)}
+              - column: {name: legal_hold_state, type: varchar(32)}
+              - column: {name: created_at, type: timestamp with time zone}
